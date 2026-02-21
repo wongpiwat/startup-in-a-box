@@ -140,7 +140,7 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
           </div>
         </div>
 
-        <div className="mt-5">
+        <div className="mt-5 rounded-2xl border border-border/60 bg-card p-4">
           <div className="flex items-center gap-3 mb-3">
             <Lightbulb className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">Try one of these:</span>
