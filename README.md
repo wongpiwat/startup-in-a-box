@@ -6,11 +6,13 @@ Turn a business idea into a full startup blueprint in seconds. Describe your con
 
 ## Screenshots
 
-<img width="480" alt="Image" src="https://github.com/user-attachments/assets/415acfbc-7b3e-4021-ba6c-9f62887402b4" />
+<img width="400" alt="Image" src="https://github.com/user-attachments/assets/415acfbc-7b3e-4021-ba6c-9f62887402b4" />
 
-<img width="480" alt="Image" src="https://github.com/user-attachments/assets/4429ee2c-86e8-4c99-9d48-15327e6c1ca8" />
+<img width="400" alt="Image" src="https://github.com/user-attachments/assets/4429ee2c-86e8-4c99-9d48-15327e6c1ca8" />
 
-<img width="480" alt="Image" src="https://github.com/user-attachments/assets/1058743a-21f8-4892-99a3-57463b1e8b49" />
+<img width="400" alt="Image" src="https://github.com/user-attachments/assets/1058743a-21f8-4892-99a3-57463b1e8b49" />
+
+<img width="400" alt="Image" src="https://github.com/user-attachments/assets/db9af480-17e4-49ce-ad53-531dee43ca17" />
 
 ---
 
