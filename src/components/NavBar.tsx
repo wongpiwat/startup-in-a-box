@@ -52,9 +52,9 @@ const NavBar = () => {
 
   const navItems = [
     { to: "/", label: "Idea", icon: Sparkles },
-    { to: "/compare", label: "Compare", icon: GitCompareArrows },
     { to: "/scoreboard", label: "Scoreboard", icon: Trophy },
     { to: "/history", label: "History", icon: History },
+    { to: "/compare", label: "Compare", icon: GitCompareArrows },
     ...(isAdmin ? [{ to: "/dashboard", label: "Metrics", icon: BarChart3 }] : []),
   ];
 
