@@ -1,0 +1,1 @@
+ALTER TABLE public.generation_metrics ADD COLUMN IF NOT EXISTS record_type text NOT NULL DEFAULT 'startup';
