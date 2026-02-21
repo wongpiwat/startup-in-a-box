@@ -74,8 +74,9 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
     setLoading(true);
 
     try {
+      const { getDeviceId } = await import("@/lib/device-id");
       const { data, error } = await supabase.functions.invoke("generate-startup", {
-        body: { idea: finalIdea.trim() },
+        body: { idea: finalIdea.trim(), device_id: getDeviceId() },
       });
 
       if (error) throw new Error(error.message);

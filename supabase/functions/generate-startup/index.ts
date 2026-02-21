@@ -12,7 +12,7 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    const { idea } = await req.json();
+    const { idea, device_id } = await req.json();
     if (!idea || typeof idea !== "string") {
       return new Response(JSON.stringify({ error: "idea is required" }), {
         status: 400,
@@ -169,6 +169,7 @@ Respond ONLY with valid JSON in this exact structure:
           output_length: rawContent.length,
           confidence_score: startup.confidenceScore ?? 0,
           result_json: startup,
+          device_id: device_id || null,
         })
         .select("id")
         .single();
