@@ -140,6 +140,8 @@ const History = () => {
     }
     setIsAdmin(true);
     setShowAdminPrompt(false);
+    localStorage.setItem("admin_authenticated", "1");
+    window.dispatchEvent(new CustomEvent("admin-changed"));
     toast.success("Admin mode enabled — you can delete any item.");
   };
 
@@ -155,6 +157,8 @@ const History = () => {
                 if (isAdmin) {
                   setIsAdmin(false);
                   setAdminPassword("");
+                  localStorage.removeItem("admin_authenticated");
+                  window.dispatchEvent(new CustomEvent("admin-changed"));
                   toast("Admin mode disabled");
                 } else {
                   setShowAdminPrompt((v) => !v);

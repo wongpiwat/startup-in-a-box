@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import NavBar from "@/components/NavBar";
 import MetricsDashboard from "@/components/MetricsDashboard";
 import Leaderboard from "@/components/Leaderboard";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BarChart3, Trophy } from "lucide-react";
+
+const ADMIN_STORAGE_KEY = "admin_authenticated";
 
 interface MetricRow {
   id: string;
@@ -21,10 +24,19 @@ interface MetricRow {
 }
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [metrics, setMetrics] = useState<MetricRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (localStorage.getItem(ADMIN_STORAGE_KEY) !== "1") {
+      navigate("/", { replace: true });
+      return;
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (localStorage.getItem(ADMIN_STORAGE_KEY) !== "1") return;
     const fetchMetrics = async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any).from("generation_metrics").select("*").order("created_at", { ascending: false }).limit(100);
