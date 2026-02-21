@@ -170,7 +170,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
     <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
-        <Button variant="ghost" onClick={onReset} className="gap-2 text-muted-foreground hover:text-foreground">
+        <Button variant="outline" onClick={onReset}>
           <ArrowLeft className="w-4 h-4" />
           New Idea
         </Button>
@@ -191,7 +191,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
             <Share2 className="w-3.5 h-3.5" /> Share
           </Button>
           <Button variant="outline" size="sm" onClick={handleSteal} className="gap-1.5 text-xs border-border/60 hover:border-primary/40">
-            <Copy className="w-3.5 h-3.5" /> Steal Idea
+            <Copy className="w-3.5 h-3.5" /> Copy Idea
           </Button>
           {hasUnsavedChanges && (
             <Button size="sm" onClick={handleSaveChanges} disabled={saving} className="gap-1.5 text-xs">

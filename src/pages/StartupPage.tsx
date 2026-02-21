@@ -63,13 +63,6 @@ const StartupPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <NavBar />
-      {/* Shared badge */}
-      <div className="max-w-6xl mx-auto px-6 pt-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-2">
-          <Sparkles className="w-3 h-3" />
-          Shared startup blueprint
-        </div>
-      </div>
       <StartupResult startup={startup} metrics={null} onReset={() => (window.location.href = "/")} startupId={id} />
       {id && <StartupComments startupId={id} />}
     </div>
