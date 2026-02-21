@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy, Medal, Star, Crown, ChevronRight, Sparkles } from "lucide-react";
+import { getPlaceholderEmoji } from "@/lib/placeholder-emoji";
 
 interface ScoreboardEntry {
   id: string;
@@ -11,7 +12,6 @@ interface ScoreboardEntry {
   confidence_score: number | null;
   idea: string;
   created_at: string;
-  logo_url: string | null;
 }
 
 const rankStyles = [
@@ -30,7 +30,7 @@ const Scoreboard = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data } = await (supabase as any)
         .from("generation_metrics")
-        .select("id, startup_name, category, confidence_score, idea, created_at, logo_url")
+        .select("id, startup_name, category, confidence_score, idea, created_at")
         .not("confidence_score", "is", null)
         .neq("record_type", "battle")
         .order("confidence_score", { ascending: false })
@@ -86,9 +86,9 @@ const Scoreboard = () => {
                       {i < 3 ? <RankIcon className="w-5 h-5" /> : `#${i + 1}`}
                     </div>
 
-                    {/* Logo or emoji */}
-                    <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-xl shrink-0 overflow-hidden">
-                      {entry.logo_url ? <img src={entry.logo_url} alt="" className="w-full h-full object-cover rounded-xl" /> : "🚀"}
+                    {/* Emoji placeholder */}
+                    <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-xl shrink-0">
+                      {getPlaceholderEmoji(entry.startup_name)}
                     </div>
 
                     {/* Info */}

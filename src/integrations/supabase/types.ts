@@ -8,63 +8,6 @@ export type Database = {
   };
   public: {
     Tables: {
-      generation_metrics: {
-        Row: {
-          category: string | null;
-          completion_tokens: number | null;
-          confidence_score: number | null;
-          created_at: string | null;
-          device_id: string | null;
-          generation_time_ms: number | null;
-          id: string;
-          idea: string;
-          is_favorite: boolean | null;
-          logo_url: string | null;
-          output_length: number | null;
-          prompt_tokens: number | null;
-          record_type: string;
-          result_json: Json | null;
-          startup_name: string | null;
-          total_tokens: number | null;
-        };
-        Insert: {
-          category?: string | null;
-          completion_tokens?: number | null;
-          confidence_score?: number | null;
-          created_at?: string | null;
-          device_id?: string | null;
-          generation_time_ms?: number | null;
-          id?: string;
-          idea: string;
-          is_favorite?: boolean | null;
-          logo_url?: string | null;
-          output_length?: number | null;
-          prompt_tokens?: number | null;
-          record_type?: string;
-          result_json?: Json | null;
-          startup_name?: string | null;
-          total_tokens?: number | null;
-        };
-        Update: {
-          category?: string | null;
-          completion_tokens?: number | null;
-          confidence_score?: number | null;
-          created_at?: string | null;
-          device_id?: string | null;
-          generation_time_ms?: number | null;
-          id?: string;
-          idea?: string;
-          is_favorite?: boolean | null;
-          logo_url?: string | null;
-          output_length?: number | null;
-          prompt_tokens?: number | null;
-          record_type?: string;
-          result_json?: Json | null;
-          startup_name?: string | null;
-          total_tokens?: number | null;
-        };
-        Relationships: [];
-      };
       startup_comments: {
         Row: {
           author_name: string;

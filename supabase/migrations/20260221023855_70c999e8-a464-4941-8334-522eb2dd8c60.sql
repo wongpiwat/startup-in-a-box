@@ -1,1 +1,0 @@
-ALTER TABLE public.generation_metrics ADD COLUMN device_id text DEFAULT NULL;

@@ -104,7 +104,7 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
       <div className="text-center mb-5 max-w-3xl">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-4">
           <Zap className="w-3.5 h-3.5" />
-          Powered by Amazon Bedrock + Gemini
+          Powered by Google Gemini 3 Flash
         </div>
         <h1 className="text-5xl md:text-6xl font-black mb-3 leading-none tracking-tight">
           <span className="gradient-text">Startup in a Box</span>

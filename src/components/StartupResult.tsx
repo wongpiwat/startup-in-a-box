@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { StartupBlueprint, GenerationMetrics } from "@/types/startup";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, Star, Zap, Users, LayoutGrid, DollarSign, Code2, Map, TrendingUp, Clock, Coins, Share2, Copy, Download, RefreshCw, Palette, ExternalLink, Info, X, Save } from "lucide-react";
+import { ArrowLeft, Star, Zap, Users, LayoutGrid, DollarSign, Code2, Map, TrendingUp, Clock, Coins, Share2, Copy, Download, RefreshCw, ExternalLink, Info, X, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import EvaluationScoresCard from "@/components/EvaluationScores";
 import CompetitionSection from "@/components/CompetitionSection";
 import MarketAnalysis from "@/components/MarketAnalysis";
+import { getPlaceholderEmoji } from "@/lib/placeholder-emoji";
 
 const TECH_INFO: Record<string, { desc: string; url: string }> = {
   React: { desc: "Popular UI library for building interactive web interfaces", url: "https://react.dev" },
@@ -104,8 +105,6 @@ const RegenerateBtn = ({ loading, onClick }: { loading: boolean; onClick: () => 
 const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }: Props) => {
   const [startup, setStartup] = useState<StartupBlueprint>(initialStartup);
   const [activeTab, setActiveTab] = useState("overview");
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [generatingLogo, setGeneratingLogo] = useState(false);
   const [regenerating, setRegenerating] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -239,27 +238,6 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
     toast.success("PDF exported!");
   };
 
-  const handleGenerateLogo = async () => {
-    setGeneratingLogo(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-logo", {
-        body: {
-          startupId: startupId ?? null,
-          startupName: startup.name,
-          category: startup.category,
-          tagline: startup.tagline,
-        },
-      });
-      if (error || data?.error) throw new Error(data?.error || error?.message);
-      setLogoUrl(data.logoUrl);
-      toast.success("Logo generated!");
-    } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Logo generation failed");
-    } finally {
-      setGeneratingLogo(false);
-    }
-  };
-
   const handleRegenerateSection = async (section: string) => {
     setRegenerating(section);
     try {
@@ -341,20 +319,9 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
       <div className="relative rounded-3xl overflow-hidden border border-border/60 bg-card mb-8 p-8">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
         <div className="relative flex flex-col md:flex-row md:items-center gap-6">
-          {/* Logo area */}
-          <div className="relative shrink-0">
-            {logoUrl ? (
-              <img src={logoUrl} alt={`${startup.name} logo`} className="w-20 h-20 rounded-2xl object-cover border border-border/60" />
-            ) : (
-              <div className="w-20 h-20 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-4xl">🚀</div>
-            )}
-            <button
-              onClick={handleGenerateLogo}
-              disabled={generatingLogo}
-              title="Generate AI logo"
-              className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-card border border-border/60 flex items-center justify-center hover:border-primary/40 hover:text-primary transition-colors shadow-lg">
-              {generatingLogo ? <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> : <Palette className="w-3 h-3" />}
-            </button>
+          {/* Logo placeholder (random emoji by startup name) */}
+          <div className="w-20 h-20 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-4xl shrink-0">
+            {getPlaceholderEmoji(startup.name)}
           </div>
 
           <div className="flex-1">
