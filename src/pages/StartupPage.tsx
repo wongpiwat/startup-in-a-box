@@ -10,7 +10,6 @@ import { Sparkles } from "lucide-react";
 const StartupPage = () => {
   const { id } = useParams<{ id: string }>();
   const [startup, setStartup] = useState<StartupBlueprint | null>(null);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -22,12 +21,11 @@ const StartupPage = () => {
         return;
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any).from("generation_metrics").select("result_json, logo_url").eq("id", id).single();
+      const { data, error } = await (supabase as any).from("generation_metrics").select("result_json").eq("id", id).single();
       if (error || !data?.result_json) {
         setNotFound(true);
       } else {
         setStartup(data.result_json as StartupBlueprint);
-        if (data.logo_url) setLogoUrl(data.logo_url);
       }
       setLoading(false);
     };

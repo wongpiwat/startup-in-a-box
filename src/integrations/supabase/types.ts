@@ -14,6 +14,7 @@ export type Database = {
           completion_tokens: number | null;
           confidence_score: number | null;
           created_at: string | null;
+          device_id: string | null;
           generation_time_ms: number | null;
           id: string;
           idea: string;
@@ -31,6 +32,7 @@ export type Database = {
           completion_tokens?: number | null;
           confidence_score?: number | null;
           created_at?: string | null;
+          device_id?: string | null;
           generation_time_ms?: number | null;
           id?: string;
           idea: string;
@@ -48,6 +50,7 @@ export type Database = {
           completion_tokens?: number | null;
           confidence_score?: number | null;
           created_at?: string | null;
+          device_id?: string | null;
           generation_time_ms?: number | null;
           id?: string;
           idea?: string;
@@ -67,6 +70,7 @@ export type Database = {
           author_name: string;
           content: string;
           created_at: string;
+          device_id: string | null;
           id: string;
           section: string | null;
           startup_id: string;
@@ -75,6 +79,7 @@ export type Database = {
           author_name: string;
           content: string;
           created_at?: string;
+          device_id?: string | null;
           id?: string;
           section?: string | null;
           startup_id: string;
@@ -83,6 +88,7 @@ export type Database = {
           author_name?: string;
           content?: string;
           created_at?: string;
+          device_id?: string | null;
           id?: string;
           section?: string | null;
           startup_id?: string;

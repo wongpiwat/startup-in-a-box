@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { StartupBlueprint, GenerationMetrics } from "@/types/startup";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, Star, Zap, Users, LayoutGrid, DollarSign, Code2, Map, TrendingUp, Clock, Coins, Share2, Copy, Download, RefreshCw, Palette, ExternalLink, Info, X, Save } from "lucide-react";
+import { ArrowLeft, Star, Zap, Users, LayoutGrid, DollarSign, Code2, Map, TrendingUp, Clock, Coins, Share2, Copy, RefreshCw, ExternalLink, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { toast } from "sonner";
-import jsPDF from "jspdf";
 import EvaluationScoresCard from "@/components/EvaluationScores";
 import CompetitionSection from "@/components/CompetitionSection";
 import MarketAnalysis from "@/components/MarketAnalysis";
+import { getPlaceholderEmoji } from "@/lib/placeholder-emoji";
 
 const TECH_INFO: Record<string, { desc: string; url: string }> = {
   React: { desc: "Popular UI library for building interactive web interfaces", url: "https://react.dev" },
@@ -104,8 +105,6 @@ const RegenerateBtn = ({ loading, onClick }: { loading: boolean; onClick: () => 
 const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }: Props) => {
   const [startup, setStartup] = useState<StartupBlueprint>(initialStartup);
   const [activeTab, setActiveTab] = useState("overview");
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [generatingLogo, setGeneratingLogo] = useState(false);
   const [regenerating, setRegenerating] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -128,136 +127,6 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
       .join(", ")}.`;
     navigator.clipboard.writeText(prompt);
     toast.success("Prompt copied! Paste it into any AI tool 🚀");
-  };
-
-  const handleExportPDF = () => {
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
-    const margin = 20;
-    const contentW = pageW - margin * 2;
-    let y = margin;
-
-    const fillPageBg = () => {
-      doc.setFillColor(15, 15, 25);
-      doc.rect(0, 0, pageW, pageH, "F");
-    };
-
-    fillPageBg();
-
-    const newPageIfNeeded = (needed: number) => {
-      if (y + needed > pageH - margin) {
-        doc.addPage();
-        fillPageBg();
-        y = margin;
-      }
-    };
-
-    const addText = (text: string, size: number, bold = false, color: [number, number, number] = [240, 240, 240]) => {
-      doc.setFontSize(size);
-      doc.setFont("helvetica", bold ? "bold" : "normal");
-      doc.setTextColor(...color);
-      // Strip emojis that jsPDF can't render
-      const clean = text.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, "").trim();
-      const lines = doc.splitTextToSize(clean, contentW);
-      lines.forEach((line: string) => {
-        newPageIfNeeded(size * 0.45 + 1);
-        doc.text(line, margin, y);
-        y += size * 0.45;
-      });
-      y += 3;
-    };
-
-    const addSection = (title: string) => {
-      y += 4;
-      newPageIfNeeded(16);
-      doc.setFillColor(80, 40, 160);
-      doc.roundedRect(margin, y - 5, contentW, 10, 2, 2, "F");
-      addText(title, 11, true, [255, 255, 255]);
-      y += 2;
-    };
-
-    const addSubheading = (title: string, color: [number, number, number] = [160, 100, 255]) => {
-      newPageIfNeeded(10);
-      addText(title, 10, true, color);
-    };
-
-    // ── Title ──
-    addText(startup.name, 28, true, [160, 100, 255]);
-    addText(startup.tagline, 13, false, [180, 180, 200]);
-    addText(`${startup.category}  |  Score: ${startup.confidenceScore}/100`, 10, false, [120, 120, 150]);
-    if (startup.evaluationScores) {
-      const s = startup.evaluationScores;
-      addText(`Solution: ${s.solution}  Problem: ${s.problem}  Features: ${s.features}  Market: ${s.market}  Revenue: ${s.revenue}  Competition: ${s.competition}  Risk: ${s.risk}`, 9, false, [140, 140, 160]);
-    }
-    y += 5;
-
-    // ── Market Analysis ──
-    addSection("Market Analysis");
-    addSubheading("Solution Overview");
-    addText(startup.investorPitch.solution, 9);
-    addSubheading("Problem Statement");
-    addText(startup.investorPitch.problemStatement, 9);
-    addSubheading("Market Size", [100, 150, 255]);
-    addText(startup.investorPitch.marketSize, 9);
-    addSubheading("Competitive Edge");
-    addText(startup.investorPitch.uniqueAdvantage, 9);
-
-    // ── Target Persona ──
-    addSection("Target Persona");
-    addText(`${startup.targetPersona.name} (${startup.targetPersona.age})`, 11, true);
-    addText("Pain Points: " + startup.targetPersona.painPoints.join(" | "), 9);
-    addText("Goals: " + startup.targetPersona.goals.join(" | "), 9);
-
-    // ── Core Features ──
-    addSection("Core Features");
-    startup.coreFeatures.forEach((f) => addText(`${f.name}: ${f.description}`, 9));
-
-    // ── Pricing Model ──
-    addSection("Pricing Model");
-    addText(`Model: ${startup.pricingModel.type}`, 10);
-    startup.pricingModel.tiers.forEach((t) => addText(`${t.name} — ${t.price}: ${t.features.join(", ")}`, 9));
-
-    // ── Tech Stack ──
-    addSection("Tech Stack");
-    Object.entries(startup.techStack).forEach(([layer, techs]) => addText(`${layer.toUpperCase()}: ${(techs as string[]).join(", ")}`, 9));
-
-    // ── Launch Roadmap ──
-    addSection("Launch Roadmap");
-    startup.launchRoadmap.forEach((p) => addText(`${p.week} — ${p.phase}: ${p.tasks.join(" | ")}`, 9));
-
-    // ── Investor Pitch ──
-    addSection("Investor Pitch");
-    addText(`Problem: ${startup.investorPitch.problemStatement}`, 9);
-    addText(`Solution: ${startup.investorPitch.solution}`, 9);
-    addText(`Market: ${startup.investorPitch.marketSize}`, 9);
-    addText(`Traction: ${startup.investorPitch.traction}`, 9);
-    addText(`Ask: ${startup.investorPitch.ask}`, 9);
-    addText(`Moat: ${startup.investorPitch.uniqueAdvantage}`, 9);
-
-    doc.save(`${startup.name.replace(/\s+/g, "_")}_pitch_deck.pdf`);
-    toast.success("PDF exported!");
-  };
-
-  const handleGenerateLogo = async () => {
-    setGeneratingLogo(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-logo", {
-        body: {
-          startupId: startupId ?? null,
-          startupName: startup.name,
-          category: startup.category,
-          tagline: startup.tagline,
-        },
-      });
-      if (error || data?.error) throw new Error(data?.error || error?.message);
-      setLogoUrl(data.logoUrl);
-      toast.success("Logo generated!");
-    } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Logo generation failed");
-    } finally {
-      setGeneratingLogo(false);
-    }
   };
 
   const handleRegenerateSection = async (section: string) => {
@@ -284,9 +153,8 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
     }
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from("generation_metrics")
-        .update({ result_json: startup as any })
+      const { error } = await supabase.from("generation_metrics")
+        .update({ result_json: startup as unknown as Json })
         .eq("id", startupId);
       if (error) throw error;
       setHasUnsavedChanges(false);
@@ -325,9 +193,6 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
           <Button variant="outline" size="sm" onClick={handleSteal} className="gap-1.5 text-xs border-border/60 hover:border-primary/40">
             <Copy className="w-3.5 h-3.5" /> Steal Idea
           </Button>
-          <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5 text-xs border-border/60 hover:border-primary/40">
-            <Download className="w-3.5 h-3.5" /> Export PDF
-          </Button>
           {hasUnsavedChanges && (
             <Button size="sm" onClick={handleSaveChanges} disabled={saving} className="gap-1.5 text-xs">
               {saving ? <div className="w-3.5 h-3.5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <Save className="w-3.5 h-3.5" />}
@@ -341,21 +206,8 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
       <div className="relative rounded-3xl overflow-hidden border border-border/60 bg-card mb-8 p-8">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
         <div className="relative flex flex-col md:flex-row md:items-center gap-6">
-          {/* Logo area */}
-          <div className="relative shrink-0">
-            {logoUrl ? (
-              <img src={logoUrl} alt={`${startup.name} logo`} className="w-20 h-20 rounded-2xl object-cover border border-border/60" />
-            ) : (
-              <div className="w-20 h-20 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-4xl">🚀</div>
-            )}
-            <button
-              onClick={handleGenerateLogo}
-              disabled={generatingLogo}
-              title="Generate AI logo"
-              className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-card border border-border/60 flex items-center justify-center hover:border-primary/40 hover:text-primary transition-colors shadow-lg">
-              {generatingLogo ? <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> : <Palette className="w-3 h-3" />}
-            </button>
-          </div>
+          {/* Logo placeholder (random emoji by startup name) */}
+          <div className="w-20 h-20 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-4xl shrink-0">{getPlaceholderEmoji(startup.name)}</div>
 
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-3 mb-2">
@@ -576,8 +428,6 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
           </SectionCard>
         </TabsContent>
       </Tabs>
-
-      {/* Score modal removed — evaluation scores are now inline */}
     </div>
   );
 };

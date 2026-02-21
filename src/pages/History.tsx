@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import NavBar from "@/components/NavBar";
-import { Clock, Coins, Star, Search, ChevronRight, Sparkles, Trash2 } from "lucide-react";
+import { Clock, Coins, Star, Search, ChevronRight, Sparkles, Trash2, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { getDeviceId } from "@/lib/device-id";
 
 interface HistoryRow {
   id: string;
@@ -18,6 +19,7 @@ interface HistoryRow {
   is_favorite: boolean;
   result_json: unknown;
   record_type: string | null;
+  device_id: string | null;
 }
 
 const History = () => {
@@ -27,6 +29,9 @@ const History = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminPrompt, setShowAdminPrompt] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,7 +39,7 @@ const History = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("generation_metrics")
-        .select("id, created_at, idea, startup_name, category, generation_time_ms, total_tokens, confidence_score, is_favorite, result_json, record_type")
+        .select("id, created_at, idea, startup_name, category, generation_time_ms, total_tokens, confidence_score, is_favorite, result_json, record_type, device_id")
         .neq("record_type", "battle")
         .order("created_at", { ascending: false })
         .limit(100);
@@ -76,13 +81,27 @@ const History = () => {
     e.stopPropagation();
     setDeletingId(id);
     setConfirmId(null);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from("generation_metrics").delete().eq("id", id);
-    if (error) {
-      toast.error("Failed to delete — please try again.");
+
+    if (isAdmin) {
+      // Admin delete via server-side check
+      const { data, error } = await supabase.functions.invoke("admin-delete", {
+        body: { password: adminPassword, record_id: id },
+      });
+      if (error || data?.error) {
+        toast.error(data?.error || "Failed to delete — please try again.");
+      } else {
+        setRows((prev) => prev.filter((r) => r.id !== id));
+        toast.success("Deleted successfully (admin).");
+      }
     } else {
-      setRows((prev) => prev.filter((r) => r.id !== id));
-      toast.success("Deleted successfully.");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any).from("generation_metrics").delete().eq("id", id);
+      if (error) {
+        toast.error("Failed to delete — please try again.");
+      } else {
+        setRows((prev) => prev.filter((r) => r.id !== id));
+        toast.success("Deleted successfully.");
+      }
     }
     setDeletingId(null);
   };
@@ -105,13 +124,49 @@ const History = () => {
   };
 
   const favCount = rows.filter((r) => r.is_favorite).length;
+  const myDeviceId = getDeviceId();
+  const canDelete = (row: HistoryRow) => isAdmin || row.device_id === myDeviceId;
+
+  const handleAdminLogin = async () => {
+    if (!adminPassword.trim()) return;
+    // Verify password by attempting a no-op call
+    const { data, error } = await supabase.functions.invoke("admin-delete", {
+      body: { password: adminPassword, record_id: "00000000-0000-0000-0000-000000000000" },
+    });
+    // Even if record not found, a 401 means wrong password
+    if (error?.message?.includes("401") || data?.error === "Unauthorized") {
+      toast.error("Invalid admin password");
+      return;
+    }
+    setIsAdmin(true);
+    setShowAdminPrompt(false);
+    localStorage.setItem("admin_authenticated", "1");
+    window.dispatchEvent(new CustomEvent("admin-changed"));
+    toast.success("Admin mode enabled — you can delete any item.");
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <NavBar />
       <div className="max-w-4xl mx-auto px-6 py-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-black mb-1">History</h1>
+          <h1
+            className="text-3xl font-black mb-1 select-none"
+            onClick={(e) => {
+              if (e.detail === 3) {
+                if (isAdmin) {
+                  setIsAdmin(false);
+                  setAdminPassword("");
+                  localStorage.removeItem("admin_authenticated");
+                  window.dispatchEvent(new CustomEvent("admin-changed"));
+                  toast("Admin mode disabled");
+                } else {
+                  setShowAdminPrompt((v) => !v);
+                }
+              }
+            }}>
+            History
+          </h1>
           <p className="text-muted-foreground">All your generated startups</p>
         </div>
 
@@ -130,6 +185,19 @@ const History = () => {
             Favorites {favCount > 0 && <span className="bg-primary/20 text-primary text-xs px-1.5 py-0.5 rounded-full">{favCount}</span>}
           </button>
         </div>
+
+        {showAdminPrompt && !isAdmin && (
+          <div className="mb-6 flex gap-2 items-center p-3 rounded-xl border border-border/60 bg-card">
+            <Shield className="w-4 h-4 text-muted-foreground shrink-0" />
+            <Input type="password" placeholder="Enter admin password..." value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleAdminLogin()} className="flex-1 bg-background" />
+            <button onClick={handleAdminLogin} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors">
+              Login
+            </button>
+            <button onClick={() => setShowAdminPrompt(false)} className="px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Cancel
+            </button>
+          </div>
+        )}
 
         {loading ? (
           <div className="text-center py-20">
@@ -200,21 +268,22 @@ const History = () => {
                     <Star className={`w-4 h-4 ${row.is_favorite ? "fill-current" : ""}`} />
                   </button>
 
-                  {confirmId === row.id ? (
-                    <>
-                      <span className="text-xs text-destructive font-medium mr-1">Delete?</span>
-                      <button onClick={(e) => handleConfirmDelete(e, row.id)} className="px-3 py-1 rounded-lg bg-destructive text-destructive-foreground text-xs font-semibold hover:bg-destructive/80 transition-colors">
-                        Yes
+                  {canDelete(row) &&
+                    (confirmId === row.id ? (
+                      <>
+                        <span className="text-xs text-destructive font-medium mr-1">Delete?</span>
+                        <button onClick={(e) => handleConfirmDelete(e, row.id)} className="px-3 py-1 rounded-lg bg-destructive text-destructive-foreground text-xs font-semibold hover:bg-destructive/80 transition-colors">
+                          Yes
+                        </button>
+                        <button onClick={handleCancelDelete} className="px-3 py-1 rounded-lg bg-secondary text-secondary-foreground text-xs font-semibold hover:bg-secondary/80 transition-colors">
+                          No
+                        </button>
+                      </>
+                    ) : (
+                      <button onClick={(e) => handleDeleteClick(e, row.id)} disabled={deletingId === row.id} className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" aria-label="Delete">
+                        {deletingId === row.id ? <div className="w-4 h-4 border-2 border-destructive/30 border-t-destructive rounded-full animate-spin" /> : <Trash2 className="w-4 h-4" />}
                       </button>
-                      <button onClick={handleCancelDelete} className="px-3 py-1 rounded-lg bg-secondary text-secondary-foreground text-xs font-semibold hover:bg-secondary/80 transition-colors">
-                        No
-                      </button>
-                    </>
-                  ) : (
-                    <button onClick={(e) => handleDeleteClick(e, row.id)} disabled={deletingId === row.id} className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" aria-label="Delete">
-                      {deletingId === row.id ? <div className="w-4 h-4 border-2 border-destructive/30 border-t-destructive rounded-full animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                    </button>
-                  )}
+                    ))}
                 </div>
               </div>
             ))}

@@ -2,8 +2,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const GEMINI_MODEL = "gemini-3-flash-preview";
 
 const SECTION_PROMPTS: Record<string, string> = {
   targetPersona: `Return ONLY this JSON:
@@ -68,6 +71,30 @@ const SECTION_PROMPTS: Record<string, string> = {
 }`,
 };
 
+async function callGemini(
+  apiKey: string,
+  systemInstruction: string,
+  userContent: string,
+  temperature = 0.9
+) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: systemInstruction }] },
+      contents: [{ role: "user", parts: [{ text: userContent }] }],
+      generationConfig: { temperature, maxOutputTokens: 4096 },
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Gemini API ${res.status}: ${errText}`);
+  }
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -80,39 +107,13 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert startup strategist. Given a startup idea and name, regenerate a specific section of their startup blueprint. Be creative, specific, and different from what they had before. Respond ONLY with valid JSON.`,
-          },
-          {
-            role: "user",
-            content: `Startup idea: "${idea}"\nStartup name: "${startupName}"\n\nRegenerate the ${section} section.\n\n${SECTION_PROMPTS[section]}`,
-          },
-        ],
-        temperature: 0.9,
-      }),
-    });
+    const systemInstruction = `You are an expert startup strategist. Given a startup idea and name, regenerate a specific section of their startup blueprint. Be creative, specific, and different from what they had before. Respond ONLY with valid JSON.`;
+    const userContent = `Startup idea: "${idea}"\nStartup name: "${startupName}"\n\nRegenerate the ${section} section.\n\n${SECTION_PROMPTS[section]}`;
 
-    if (!response.ok) {
-      if (response.status === 429) throw new Error("Rate limit exceeded. Please try again.");
-      if (response.status === 402) throw new Error("Credits required.");
-      throw new Error("AI generation failed");
-    }
-
-    const aiData = await response.json();
-    const rawContent = aiData.choices?.[0]?.message?.content ?? "";
+    const rawContent = await callGemini(GEMINI_API_KEY, systemInstruction, userContent, 0.9);
 
     let sectionData;
     try {
@@ -128,9 +129,16 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("regenerate-section error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    const is429 = msg.includes("429") || msg.toLowerCase().includes("resource has been exhausted");
+    return new Response(
+      JSON.stringify({
+        error: is429 ? "Rate limit exceeded. Please try again." : msg,
+      }),
+      {
+        status: is429 ? 429 : 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   }
 });

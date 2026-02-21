@@ -74,8 +74,9 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
     setLoading(true);
 
     try {
+      const { getDeviceId } = await import("@/lib/device-id");
       const { data, error } = await supabase.functions.invoke("generate-startup", {
-        body: { idea: finalIdea.trim() },
+        body: { idea: finalIdea.trim(), device_id: getDeviceId() },
       });
 
       if (error) throw new Error(error.message);
@@ -103,7 +104,7 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
       <div className="text-center mb-5 max-w-3xl">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-4">
           <Zap className="w-3.5 h-3.5" />
-          Powered by Amazon Bedrock + Gemini
+          Powered by Google Gemini 3 Flash
         </div>
         <h1 className="text-5xl md:text-6xl font-black mb-3 leading-none tracking-tight">
           <span className="gradient-text">Startup in a Box</span>
@@ -112,7 +113,7 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
       </div>
 
       <div className="w-full max-w-2xl">
-        <div className="relative rounded-2xl border border-border/60 bg-card p-2 shadow-2xl">
+        <div className="relative rounded-2xl border border-border/60 bg-card p-2 shadow-lg">
           <div className="flex items-center gap-3 p-3">
             <Sparkles className="w-5 h-5 text-primary shrink-0" />
             <input
@@ -139,7 +140,7 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
           </div>
         </div>
 
-        <div className="mt-5">
+        <div className="mt-6 rounded-2xl border border-border/60 bg-background p-4">
           <div className="flex items-center gap-3 mb-3">
             <Lightbulb className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">Try one of these:</span>
@@ -156,7 +157,7 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
           </div>
 
           {/* Category tabs */}
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-2 mb-4">
             <button
               onClick={() => setActiveCategory(null)}
               disabled={loading}
@@ -179,7 +180,7 @@ const GeneratorInput = ({ onResult, loading, setLoading }: GeneratorInputProps) 
           </div>
 
           {/* Idea chips - limited to fit viewport */}
-          <div className="flex flex-wrap gap-2 max-h-[9rem] overflow-y-auto scrollbar-thin">
+          <div className="flex flex-wrap gap-2 max-h-[9rem] overflow-y-auto scrollbar-thin rounded-xl border border-border/60 bg-secondary/30 p-3">
             {visibleIdeas.map((ex) => (
               <button
                 key={ex}

@@ -3,8 +3,43 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const GEMINI_MODEL = "gemini-3-flash-preview";
+
+async function callGemini(
+  apiKey: string,
+  systemInstruction: string,
+  userContent: string,
+  temperature = 0.85
+) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: systemInstruction }] },
+      contents: [{ role: "user", parts: [{ text: userContent }] }],
+      generationConfig: { temperature, maxOutputTokens: 8192 },
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Gemini API ${res.status}: ${errText}`);
+  }
+  const data = await res.json();
+  const text =
+    data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  const usage = data.usageMetadata ?? {};
+  return {
+    text,
+    promptTokenCount: usage.promptTokenCount ?? 0,
+    candidatesTokenCount: usage.candidatesTokenCount ?? 0,
+    totalTokenCount: usage.totalTokenCount ?? 0,
+  };
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -12,7 +47,7 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    const { idea } = await req.json();
+    const { idea, device_id } = await req.json();
     if (!idea || typeof idea !== "string") {
       return new Response(JSON.stringify({ error: "idea is required" }), {
         status: 400,
@@ -20,27 +55,14 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert startup strategist, product designer, and venture capitalist. 
+    const systemInstruction = `You are an expert startup strategist, product designer, and venture capitalist. 
 When given a startup idea, you generate a comprehensive, realistic, and exciting startup blueprint.
-Always respond with valid JSON matching the exact schema provided. Be specific, creative, and make it feel like a real company.`,
-          },
-          {
-            role: "user",
-            content: `Generate a complete startup blueprint for this idea: "${idea}"
+Always respond with valid JSON matching the exact schema provided. Be specific, creative, and make it feel like a real company.`;
+
+    const userContent = `Generate a complete startup blueprint for this idea: "${idea}"
 
 Respond ONLY with valid JSON in this exact structure:
 {
@@ -102,41 +124,17 @@ Respond ONLY with valid JSON in this exact structure:
     "competition": "<number 1-10, competitive landscape favorability>",
     "risk": "<number 1-10, lower means higher risk — 10 means very low risk>"
   }
-}`,
-          },
-        ],
-        temperature: 0.85,
-      }),
-    });
+}`;
+
+    const { text: rawContent, promptTokenCount, candidatesTokenCount, totalTokenCount } = await callGemini(
+      GEMINI_API_KEY,
+      systemInstruction,
+      userContent,
+      0.85
+    );
 
     const generationTime = Date.now() - startTime;
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Credits required. Please add funds to your workspace." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const errText = await response.text();
-      console.error("AI gateway error:", response.status, errText);
-      return new Response(JSON.stringify({ error: "AI generation failed" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const aiData = await response.json();
-    const rawContent = aiData.choices?.[0]?.message?.content ?? "";
-    const usage = aiData.usage ?? {};
-
-    // Parse JSON from the response (handle markdown code blocks)
     let startup;
     try {
       const jsonMatch = rawContent.match(/```json\n?([\s\S]*?)\n?```/) || rawContent.match(/({[\s\S]*})/);
@@ -150,25 +148,25 @@ Respond ONLY with valid JSON in this exact structure:
       });
     }
 
-    // Save metrics + full result to database
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     let savedId: string | null = null;
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
       const { data: inserted } = await supabase
-        .from("generation_metrics")
+        .from("generation_startup")
         .insert({
           idea: idea,
           startup_name: startup.name,
           category: startup.category,
           generation_time_ms: generationTime,
-          prompt_tokens: usage.prompt_tokens ?? 0,
-          completion_tokens: usage.completion_tokens ?? 0,
-          total_tokens: usage.total_tokens ?? 0,
+          prompt_tokens: promptTokenCount,
+          completion_tokens: candidatesTokenCount,
+          total_tokens: totalTokenCount,
           output_length: rawContent.length,
           confidence_score: startup.confidenceScore ?? 0,
           result_json: startup,
+          device_id: device_id || null,
         })
         .select("id")
         .single();
@@ -181,18 +179,21 @@ Respond ONLY with valid JSON in this exact structure:
         startup,
         metrics: {
           generationTimeMs: generationTime,
-          promptTokens: usage.prompt_tokens ?? 0,
-          completionTokens: usage.completion_tokens ?? 0,
-          totalTokens: usage.total_tokens ?? 0,
+          promptTokens: promptTokenCount,
+          completionTokens: candidatesTokenCount,
+          totalTokens: totalTokenCount,
           outputLength: rawContent.length,
         },
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
     console.error("generate-startup error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500,
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    const is429 = msg.includes("429") || msg.toLowerCase().includes("resource has been exhausted");
+    const status = is429 ? 429 : 500;
+    return new Response(JSON.stringify({ error: is429 ? "Rate limit exceeded. Please try again in a moment." : msg }), {
+      status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
