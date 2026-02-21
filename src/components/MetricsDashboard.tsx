@@ -314,7 +314,7 @@ const MetricsDashboard = ({ metrics, loading }: Props) => {
                   <td className="py-3 px-3 text-muted-foreground">{(m.completion_tokens || 0).toLocaleString()}</td>
                   <td className="py-3 px-3 text-muted-foreground font-medium">{(m.total_tokens || 0).toLocaleString()}</td>
                   <td className="py-3 px-3">
-                    <span className={`font-bold ${(m.confidence_score || 0) >= 80 ? "text-green-400" : (m.confidence_score || 0) >= 60 ? "text-yellow-400" : "text-destructive"}`}>{m.confidence_score}/100</span>
+                    <span className={`font-bold ${(m.confidence_score || 0) >= 80 ? "text-green-400" : (m.confidence_score || 0) >= 60 ? "text-yellow-600" : "text-destructive"}`}>{m.confidence_score}/100</span>
                   </td>
                 </tr>
               ))}

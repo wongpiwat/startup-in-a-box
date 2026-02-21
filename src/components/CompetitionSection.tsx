@@ -30,7 +30,7 @@ interface Props {
 
 const threatColors: Record<string, string> = {
   low: "text-green-400 bg-green-400/10 border-green-400/30",
-  medium: "text-yellow-400 bg-yellow-400/10 border-yellow-400/30",
+  medium: "text-yellow-600 bg-yellow-600/10 border-yellow-600/30",
   high: "text-destructive bg-destructive/10 border-destructive/30",
 };
 

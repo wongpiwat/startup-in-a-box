@@ -53,7 +53,7 @@ const MarketAnalysis = ({ startup }: Props) => {
         <div className="rounded-xl bg-amber-500/5 border border-amber-500/10 p-5">
           <div className="flex items-center gap-2 mb-3">
             <DollarSign className="w-4 h-4 text-amber-400" />
-            <h3 className="font-semibold text-amber-400">Monetization</h3>
+            <h3 className="font-semibold text-amber-600">Monetization</h3>
           </div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{pricingModel.type}</p>
           <ul className="space-y-1.5">
@@ -69,7 +69,7 @@ const MarketAnalysis = ({ startup }: Props) => {
         </div>
 
         {/* Competitive Edge */}
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div className="rounded-xl bg-indigo-500/10 border border-indigo-500/10 p-5">
           <div className="flex items-center gap-2 mb-3">
             <Shield className="w-4 h-4 text-primary" />
             <h3 className="font-semibold text-primary">Competitive Edge</h3>

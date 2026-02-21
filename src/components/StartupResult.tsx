@@ -297,10 +297,10 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
               </div>
               <div className="space-y-3">
                 {startup.pricingModel.tiers.map((tier, i) => (
-                  <div key={i} className={`rounded-xl p-4 border ${i === 1 ? "border-primary/40 bg-primary/5" : "border-border/60 bg-secondary/30"}`}>
+                  <div key={i} className="rounded-xl p-4 border border-primary/40 bg-primary/5">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-semibold">{tier.name}</span>
-                      <span className={`font-bold ${i === 1 ? "text-primary" : "text-foreground"}`}>{tier.price}</span>
+                      <span className="font-bold text-primary">{tier.price}</span>
                     </div>
                     <ul className="space-y-1">
                       {tier.features.map((f, j) => (
@@ -415,7 +415,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
                 { label: "The Problem", content: startup.investorPitch.problemStatement, color: "text-destructive" },
                 { label: "Our Solution", content: startup.investorPitch.solution, color: "text-primary" },
                 { label: "Market Size", content: startup.investorPitch.marketSize, color: "text-blue-400" },
-                { label: "Early Traction", content: startup.investorPitch.traction, color: "text-yellow-400" },
+                { label: "Early Traction", content: startup.investorPitch.traction, color: "text-yellow-600" },
                 { label: "The Ask", content: startup.investorPitch.ask, color: "text-accent" },
                 { label: "Unique Advantage", content: startup.investorPitch.uniqueAdvantage, color: "text-purple-400" },
               ].map(({ label, content, color }) => (

@@ -15,7 +15,7 @@ interface ScoreboardEntry {
 }
 
 const rankStyles = [
-  { bg: "bg-yellow-500/15", border: "border-yellow-500/40", text: "text-yellow-500", icon: Crown },
+  { bg: "bg-yellow-600/15", border: "border-yellow-500/40", text: "text-yellow-600", icon: Crown },
   { bg: "bg-slate-300/15", border: "border-slate-400/40", text: "text-slate-400", icon: Medal },
   { bg: "bg-amber-700/15", border: "border-amber-700/40", text: "text-amber-700", icon: Medal },
 ];
