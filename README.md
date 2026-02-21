@@ -57,15 +57,15 @@ The app runs at **http://localhost:8080** (or the next available port). The dev 
 
 ## Available scripts
 
-| Command | Description |
-|--------|-------------|
-| `npm run dev` | Start the Vite dev server (default port 8080). |
-| `npm run build` | Production build; output is in `dist/`. |
-| `npm run build:dev` | Build in development mode. |
-| `npm run preview` | Serve the production build locally. |
-| `npm run lint` | Run ESLint. |
-| `npm run test` | Run Vitest once. |
-| `npm run test:watch` | Run Vitest in watch mode. |
+| Command              | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `npm run dev`        | Start the Vite dev server (default port 8080). |
+| `npm run build`      | Production build; output is in `dist/`.        |
+| `npm run build:dev`  | Build in development mode.                     |
+| `npm run preview`    | Serve the production build locally.            |
+| `npm run lint`       | Run ESLint.                                    |
+| `npm run test`       | Run Vitest once.                               |
+| `npm run test:watch` | Run Vitest in watch mode.                      |
 
 ---
 
@@ -95,29 +95,29 @@ Imports use the `@/` alias for `src/` (e.g. `@/components/NavBar`).
 
 ## Tech stack
 
-| Category | Technologies |
-|----------|--------------|
-| **Build & dev** | Vite 5, TypeScript |
-| **UI** | React 18, React Router 6, shadcn-ui (Radix), Tailwind CSS, Lucide icons |
-| **Data & state** | TanStack React Query, Supabase (backend + optional persistence) |
-| **Forms & validation** | React Hook Form, Zod, `@hookform/resolvers` |
-| **Charts & visuals** | Recharts |
-| **Other** | date-fns, jsPDF (export), Sonner (toasts), next-themes (theme) |
-| **Testing** | Vitest, React Testing Library, jsdom |
+| Category               | Technologies                                                            |
+| ---------------------- | ----------------------------------------------------------------------- |
+| **Build & dev**        | Vite 5, TypeScript                                                      |
+| **UI**                 | React 18, React Router 6, shadcn-ui (Radix), Tailwind CSS, Lucide icons |
+| **Data & state**       | TanStack React Query, Supabase (backend + optional persistence)         |
+| **Forms & validation** | React Hook Form, Zod, `@hookform/resolvers`                             |
+| **Charts & visuals**   | Recharts                                                                |
+| **Other**              | date-fns, jsPDF (export), Sonner (toasts), next-themes (theme)          |
+| **Testing**            | Vitest, React Testing Library, jsdom                                    |
 
 ---
 
 ## Routes
 
-| Path | Page |
-|------|------|
-| `/` | Home — idea input and generated blueprint result |
-| `/startup/:id` | Startup detail view |
-| `/history` | Past generations (search, favorites, delete) |
-| `/compare` | Compare up to 3 blueprints |
-| `/scoreboard` | Top blueprints by confidence score |
-| `/dashboard` | Metrics and leaderboard |
-| `*` | 404 Not found |
+| Path           | Page                                             |
+| -------------- | ------------------------------------------------ |
+| `/`            | Home — idea input and generated blueprint result |
+| `/startup/:id` | Startup detail view                              |
+| `/history`     | Past generations (search, favorites, delete)     |
+| `/compare`     | Compare up to 3 blueprints                       |
+| `/scoreboard`  | Top blueprints by confidence score               |
+| `/dashboard`   | Metrics and leaderboard                          |
+| `*`            | 404 Not found                                    |
 
 ---
 
@@ -155,7 +155,3 @@ Configure your domain in your hosting provider’s dashboard (e.g. **Domains** o
 - **GitHub:** Use the file **Edit** button or **GitHub Codespaces** (Code → Codespaces → New codespace) to edit and commit in the browser.
 
 ---
-
-## License
-
-Private. Use according to your project’s terms.

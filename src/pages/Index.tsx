@@ -39,7 +39,11 @@ const Index = () => {
         <StartupResult
           startup={startup}
           metrics={metrics}
-          onReset={() => { setStartup(null); setMetrics(null); setStartupId(null); }}
+          onReset={() => {
+            setStartup(null);
+            setMetrics(null);
+            setStartupId(null);
+          }}
           startupId={startupId}
         />
       )}

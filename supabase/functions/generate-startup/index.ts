@@ -3,8 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -157,18 +156,22 @@ Respond ONLY with valid JSON in this exact structure:
     let savedId: string | null = null;
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
-      const { data: inserted } = await supabase.from("generation_metrics").insert({
-        idea: idea,
-        startup_name: startup.name,
-        category: startup.category,
-        generation_time_ms: generationTime,
-        prompt_tokens: usage.prompt_tokens ?? 0,
-        completion_tokens: usage.completion_tokens ?? 0,
-        total_tokens: usage.total_tokens ?? 0,
-        output_length: rawContent.length,
-        confidence_score: startup.confidenceScore ?? 0,
-        result_json: startup,
-      }).select("id").single();
+      const { data: inserted } = await supabase
+        .from("generation_metrics")
+        .insert({
+          idea: idea,
+          startup_name: startup.name,
+          category: startup.category,
+          generation_time_ms: generationTime,
+          prompt_tokens: usage.prompt_tokens ?? 0,
+          completion_tokens: usage.completion_tokens ?? 0,
+          total_tokens: usage.total_tokens ?? 0,
+          output_length: rawContent.length,
+          confidence_score: startup.confidenceScore ?? 0,
+          result_json: startup,
+        })
+        .select("id")
+        .single();
       if (inserted) savedId = inserted.id;
     }
 
@@ -184,7 +187,7 @@ Respond ONLY with valid JSON in this exact structure:
           outputLength: rawContent.length,
         },
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
     console.error("generate-startup error:", e);

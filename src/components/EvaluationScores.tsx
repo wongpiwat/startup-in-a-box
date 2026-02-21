@@ -28,14 +28,22 @@ const ScoreRing = ({ value, label, size = 56, onClick }: ScoreRingProps) => {
   const progress = (value / 10) * circumference;
 
   return (
-    <div
-      className={`flex flex-col items-center gap-1.5 ${onClick ? "cursor-pointer hover:scale-105 transition-transform" : ""}`}
-      onClick={onClick}
-    >
+    <div className={`flex flex-col items-center gap-1.5 ${onClick ? "cursor-pointer hover:scale-105 transition-transform" : ""}`} onClick={onClick}>
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="-rotate-90">
           <circle cx={size / 2} cy={size / 2} r={radius} fill="none" className="stroke-muted/40" strokeWidth={strokeWidth} />
-          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" className={getScoreStrokeClass(value)} strokeWidth={strokeWidth} strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={circumference - progress} style={{ transition: "stroke-dashoffset 0.8s ease-out" }} />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            className={getScoreStrokeClass(value)}
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference - progress}
+            style={{ transition: "stroke-dashoffset 0.8s ease-out" }}
+          />
         </svg>
         <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-foreground">{value}</span>
       </div>
@@ -56,7 +64,18 @@ const OverallRing = ({ value, size = 96 }: { value: number; size?: number }) => 
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="-rotate-90">
           <circle cx={size / 2} cy={size / 2} r={radius} fill="none" className="stroke-muted/30" strokeWidth={strokeWidth} />
-          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" className={getScoreStrokeClass(value)} strokeWidth={strokeWidth} strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={circumference - progress} style={{ transition: "stroke-dashoffset 1s ease-out" }} />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            className={getScoreStrokeClass(value)}
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference - progress}
+            style={{ transition: "stroke-dashoffset 1s ease-out" }}
+          />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-2xl font-black text-foreground">{value.toFixed(1)}</span>
@@ -146,9 +165,11 @@ const EvaluationScoresCard = ({ scores }: Props) => {
             <h2 className="font-bold text-lg">Evaluation Scores</h2>
           </div>
           <button
-            onClick={() => { setSelectedCategory(null); setShowModal(true); }}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
-          >
+            onClick={() => {
+              setSelectedCategory(null);
+              setShowModal(true);
+            }}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors">
             <Info className="w-3.5 h-3.5" />
             <span>How it works</span>
           </button>
@@ -171,9 +192,7 @@ const EvaluationScoresCard = ({ scores }: Props) => {
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
           <div className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl p-6 animate-in fade-in-0 zoom-in-95">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-lg">
-                {selectedCategory ? `${CATEGORY_DETAILS[selectedCategory].emoji} ${categories.find(c => c.key === selectedCategory)?.label} Score` : "How AI Calculates Scores"}
-              </h3>
+              <h3 className="font-bold text-lg">{selectedCategory ? `${CATEGORY_DETAILS[selectedCategory].emoji} ${categories.find((c) => c.key === selectedCategory)?.label} Score` : "How AI Calculates Scores"}</h3>
               <button onClick={() => setShowModal(false)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground">
                 <X className="w-4 h-4" />
               </button>
@@ -204,10 +223,7 @@ const EvaluationScoresCard = ({ scores }: Props) => {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className="text-xs text-primary hover:underline"
-                >
+                <button onClick={() => setSelectedCategory(null)} className="text-xs text-primary hover:underline">
                   ← View all categories
                 </button>
               </div>
@@ -216,8 +232,8 @@ const EvaluationScoresCard = ({ scores }: Props) => {
               <div className="space-y-5">
                 <div className="rounded-xl bg-secondary/50 border border-border/40 p-4">
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    The AI evaluates each startup idea across <strong className="text-foreground">7 dimensions</strong>, scoring each from 1–10. 
-                    The overall score is the average of all individual scores. Each dimension is assessed based on specific factors like market size, competitive landscape, and technical feasibility.
+                    The AI evaluates each startup idea across <strong className="text-foreground">7 dimensions</strong>, scoring each from 1–10. The overall score is the average of all individual scores. Each dimension is assessed based on specific
+                    factors like market size, competitive landscape, and technical feasibility.
                   </p>
                 </div>
 
@@ -226,11 +242,7 @@ const EvaluationScoresCard = ({ scores }: Props) => {
                     const detail = CATEGORY_DETAILS[key];
                     const value = scores[key];
                     return (
-                      <button
-                        key={key}
-                        onClick={() => setSelectedCategory(key)}
-                        className="w-full flex items-center gap-3 rounded-xl border border-border/40 bg-secondary/20 hover:bg-secondary/40 hover:border-primary/30 p-3 transition-all text-left"
-                      >
+                      <button key={key} onClick={() => setSelectedCategory(key)} className="w-full flex items-center gap-3 rounded-xl border border-border/40 bg-secondary/20 hover:bg-secondary/40 hover:border-primary/30 p-3 transition-all text-left">
                         <span className="text-lg">{detail.emoji}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-foreground">{label}</p>

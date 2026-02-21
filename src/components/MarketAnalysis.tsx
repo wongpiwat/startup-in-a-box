@@ -55,14 +55,14 @@ const MarketAnalysis = ({ startup }: Props) => {
             <DollarSign className="w-4 h-4 text-amber-400" />
             <h3 className="font-semibold text-amber-400">Monetization</h3>
           </div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-            {pricingModel.type}
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{pricingModel.type}</p>
           <ul className="space-y-1.5">
             {pricingModel.tiers.map((t, i) => (
               <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5" />
-                <span><span className="font-medium text-foreground">{t.name}:</span> {t.price}</span>
+                <span>
+                  <span className="font-medium text-foreground">{t.name}:</span> {t.price}
+                </span>
               </li>
             ))}
           </ul>

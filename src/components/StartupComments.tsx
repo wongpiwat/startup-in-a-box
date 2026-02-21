@@ -26,11 +26,7 @@ const StartupComments = ({ startupId }: Props) => {
   useEffect(() => {
     const fetch = async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await (supabase as any)
-        .from("startup_comments")
-        .select("*")
-        .eq("startup_id", startupId)
-        .order("created_at", { ascending: true });
+      const { data } = await (supabase as any).from("startup_comments").select("*").eq("startup_id", startupId).order("created_at", { ascending: true });
       if (data) setComments(data as Comment[]);
       setLoading(false);
     };
@@ -42,23 +38,25 @@ const StartupComments = ({ startupId }: Props) => {
     const trimmedName = name.trim();
     const trimmedContent = content.trim();
     if (!trimmedName || !trimmedContent) return;
-    if (trimmedName.length > 50) { toast.error("Name must be 50 characters or less."); return; }
-    if (trimmedContent.length > 1000) { toast.error("Comment must be 1000 characters or less."); return; }
+    if (trimmedName.length > 50) {
+      toast.error("Name must be 50 characters or less.");
+      return;
+    }
+    if (trimmedContent.length > 1000) {
+      toast.error("Comment must be 1000 characters or less.");
+      return;
+    }
 
     setSubmitting(true);
     localStorage.setItem("comment_name", trimmedName);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
-      .from("startup_comments")
-      .insert({ startup_id: startupId, author_name: trimmedName, content: trimmedContent })
-      .select()
-      .single();
+    const { data, error } = await (supabase as any).from("startup_comments").insert({ startup_id: startupId, author_name: trimmedName, content: trimmedContent }).select().single();
 
     if (error) {
       toast.error("Failed to post comment.");
     } else if (data) {
-      setComments(prev => [...prev, data as Comment]);
+      setComments((prev) => [...prev, data as Comment]);
       setContent("");
       toast.success("Comment posted!");
     }
@@ -91,7 +89,7 @@ const StartupComments = ({ startupId }: Props) => {
           <p className="text-sm text-muted-foreground py-4">No comments yet. Be the first to share your thoughts!</p>
         ) : (
           <div className="space-y-4 mb-6">
-            {comments.map(c => (
+            {comments.map((c) => (
               <div key={c.id} className="flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
                   <User className="w-4 h-4 text-primary" />
@@ -114,7 +112,7 @@ const StartupComments = ({ startupId }: Props) => {
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
               maxLength={50}
               className="w-40 bg-secondary/50 border border-border/60 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 transition-colors"
@@ -123,17 +121,12 @@ const StartupComments = ({ startupId }: Props) => {
               <input
                 type="text"
                 value={content}
-                onChange={e => setContent(e.target.value)}
+                onChange={(e) => setContent(e.target.value)}
                 placeholder="Share your thoughts on this startup..."
                 maxLength={1000}
                 className="flex-1 bg-secondary/50 border border-border/60 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 transition-colors"
               />
-              <Button
-                type="submit"
-                size="sm"
-                disabled={submitting || !name.trim() || !content.trim()}
-                className="gap-1.5 shrink-0"
-              >
+              <Button type="submit" size="sm" disabled={submitting || !name.trim() || !content.trim()} className="gap-1.5 shrink-0">
                 <Send className="w-3.5 h-3.5" />
                 Post
               </Button>

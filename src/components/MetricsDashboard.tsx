@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell, CartesianGrid, AreaChart, Area
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, CartesianGrid, AreaChart, Area } from "recharts";
 import { Clock, Coins, FileText, Star, TrendingUp, Zap, Hash, CalendarDays } from "lucide-react";
 
 interface MetricRow {
@@ -24,20 +21,9 @@ interface Props {
   loading: boolean;
 }
 
-const COLORS = [
-  "hsl(258 90% 66%)",
-  "hsl(200 90% 60%)",
-  "hsl(290 80% 60%)",
-  "hsl(160 70% 50%)",
-  "hsl(40 90% 60%)",
-  "hsl(0 80% 60%)",
-  "hsl(320 80% 55%)",
-  "hsl(180 70% 50%)",
-];
+const COLORS = ["hsl(258 90% 66%)", "hsl(200 90% 60%)", "hsl(290 80% 60%)", "hsl(160 70% 50%)", "hsl(40 90% 60%)", "hsl(0 80% 60%)", "hsl(320 80% 55%)", "hsl(180 70% 50%)"];
 
-const StatCard = ({
-  label, value, sub, icon: Icon, trend
-}: { label: string; value: string; sub?: string; icon: React.ComponentType<{ className?: string }>; trend?: string }) => (
+const StatCard = ({ label, value, sub, icon: Icon, trend }: { label: string; value: string; sub?: string; icon: React.ComponentType<{ className?: string }>; trend?: string }) => (
   <div className="rounded-2xl border border-border/60 bg-card p-6">
     <div className="flex items-center justify-between mb-3">
       <span className="text-sm text-muted-foreground">{label}</span>
@@ -84,10 +70,10 @@ const MetricsDashboard = ({ metrics, loading }: Props) => {
   const totalPromptTokens = metrics.reduce((a, m) => a + (m.prompt_tokens || 0), 0);
   const totalCompletionTokens = metrics.reduce((a, m) => a + (m.completion_tokens || 0), 0);
   const avgOutputLen = Math.round(metrics.reduce((a, m) => a + (m.output_length || 0), 0) / totalGenerations);
-  const fastestGen = Math.min(...metrics.map(m => m.generation_time_ms || Infinity));
-  const slowestGen = Math.max(...metrics.map(m => m.generation_time_ms || 0));
-  const highestConfidence = Math.max(...metrics.map(m => m.confidence_score || 0));
-  const lowestConfidence = Math.min(...metrics.map(m => m.confidence_score || Infinity));
+  const fastestGen = Math.min(...metrics.map((m) => m.generation_time_ms || Infinity));
+  const slowestGen = Math.max(...metrics.map((m) => m.generation_time_ms || 0));
+  const highestConfidence = Math.max(...metrics.map((m) => m.confidence_score || 0));
+  const lowestConfidence = Math.min(...metrics.map((m) => m.confidence_score || Infinity));
 
   // Category frequency
   const categoryCount: Record<string, number> = {};
@@ -100,18 +86,16 @@ const MetricsDashboard = ({ metrics, loading }: Props) => {
     .map(([name, value]) => ({ name: name.length > 16 ? name.slice(0, 16) + "…" : name, value }));
 
   // Timeline data (all, reversed to chronological)
-  const timelineData = [...metrics]
-    .reverse()
-    .map((m, i) => ({
-      index: i + 1,
-      name: m.startup_name || `#${i + 1}`,
-      time: +((m.generation_time_ms || 0) / 1000).toFixed(2),
-      tokens: m.total_tokens || 0,
-      promptTokens: m.prompt_tokens || 0,
-      completionTokens: m.completion_tokens || 0,
-      confidence: m.confidence_score || 0,
-      outputLen: m.output_length || 0,
-    }));
+  const timelineData = [...metrics].reverse().map((m, i) => ({
+    index: i + 1,
+    name: m.startup_name || `#${i + 1}`,
+    time: +((m.generation_time_ms || 0) / 1000).toFixed(2),
+    tokens: m.total_tokens || 0,
+    promptTokens: m.prompt_tokens || 0,
+    completionTokens: m.completion_tokens || 0,
+    confidence: m.confidence_score || 0,
+    outputLen: m.output_length || 0,
+  }));
 
   // Real token distribution
   const pieData = [
@@ -121,19 +105,21 @@ const MetricsDashboard = ({ metrics, loading }: Props) => {
 
   // Confidence distribution buckets
   const confidenceBuckets = [
-    { range: "0-40", count: metrics.filter(m => m.confidence_score <= 40).length },
-    { range: "41-60", count: metrics.filter(m => m.confidence_score > 40 && m.confidence_score <= 60).length },
-    { range: "61-80", count: metrics.filter(m => m.confidence_score > 60 && m.confidence_score <= 80).length },
-    { range: "81-100", count: metrics.filter(m => m.confidence_score > 80).length },
+    { range: "0-40", count: metrics.filter((m) => m.confidence_score <= 40).length },
+    { range: "41-60", count: metrics.filter((m) => m.confidence_score > 40 && m.confidence_score <= 60).length },
+    { range: "61-80", count: metrics.filter((m) => m.confidence_score > 60 && m.confidence_score <= 80).length },
+    { range: "81-100", count: metrics.filter((m) => m.confidence_score > 80).length },
   ];
 
   // Daily generation count
   const dailyCount: Record<string, number> = {};
-  metrics.forEach(m => {
+  metrics.forEach((m) => {
     const day = new Date(m.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
     dailyCount[day] = (dailyCount[day] || 0) + 1;
   });
-  const dailyData = Object.entries(dailyCount).reverse().map(([day, count]) => ({ day, count }));
+  const dailyData = Object.entries(dailyCount)
+    .reverse()
+    .map(([day, count]) => ({ day, count }));
 
   const customTooltipStyle = {
     backgroundColor: "hsl(240 10% 6%)",
@@ -157,24 +143,9 @@ const MetricsDashboard = ({ metrics, loading }: Props) => {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard label="Total Generations" value={String(totalGenerations)} icon={Zap} sub={`${totalTokens.toLocaleString()} total tokens`} />
-        <StatCard
-          label="Avg Generation Time"
-          value={`${(avgGenTime / 1000).toFixed(1)}s`}
-          sub={`Range: ${(fastestGen / 1000).toFixed(1)}s – ${(slowestGen / 1000).toFixed(1)}s`}
-          icon={Clock}
-        />
-        <StatCard
-          label="Avg Token Usage"
-          value={avgTokens.toLocaleString()}
-          sub={`~${avgOutputLen.toLocaleString()} chars output`}
-          icon={Coins}
-        />
-        <StatCard
-          label="Avg Confidence Score"
-          value={`${avgConfidence}/100`}
-          sub={`Range: ${lowestConfidence} – ${highestConfidence}`}
-          icon={Star}
-        />
+        <StatCard label="Avg Generation Time" value={`${(avgGenTime / 1000).toFixed(1)}s`} sub={`Range: ${(fastestGen / 1000).toFixed(1)}s – ${(slowestGen / 1000).toFixed(1)}s`} icon={Clock} />
+        <StatCard label="Avg Token Usage" value={avgTokens.toLocaleString()} sub={`~${avgOutputLen.toLocaleString()} chars output`} icon={Coins} />
+        <StatCard label="Avg Confidence Score" value={`${avgConfidence}/100`} sub={`Range: ${lowestConfidence} – ${highestConfidence}`} icon={Star} />
       </div>
 
       {/* Charts Row 1 */}
@@ -326,7 +297,9 @@ const MetricsDashboard = ({ metrics, loading }: Props) => {
             <thead>
               <tr className="border-b border-border/60">
                 {["Startup", "Idea", "Category", "Time", "Prompt", "Completion", "Total", "Score"].map((h) => (
-                  <th key={h} className="text-left py-3 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{h}</th>
+                  <th key={h} className="text-left py-3 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -335,21 +308,13 @@ const MetricsDashboard = ({ metrics, loading }: Props) => {
                 <tr key={m.id} className="border-b border-border/30 hover:bg-secondary/30 transition-colors">
                   <td className="py-3 px-3 font-medium">{m.startup_name || "—"}</td>
                   <td className="py-3 px-3 text-muted-foreground max-w-[180px] truncate">{m.idea}</td>
-                  <td className="py-3 px-3">
-                    {m.category && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20">
-                        {m.category}
-                      </span>
-                    )}
-                  </td>
+                  <td className="py-3 px-3">{m.category && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20">{m.category}</span>}</td>
                   <td className="py-3 px-3 text-muted-foreground">{((m.generation_time_ms || 0) / 1000).toFixed(1)}s</td>
                   <td className="py-3 px-3 text-muted-foreground">{(m.prompt_tokens || 0).toLocaleString()}</td>
                   <td className="py-3 px-3 text-muted-foreground">{(m.completion_tokens || 0).toLocaleString()}</td>
                   <td className="py-3 px-3 text-muted-foreground font-medium">{(m.total_tokens || 0).toLocaleString()}</td>
                   <td className="py-3 px-3">
-                    <span className={`font-bold ${(m.confidence_score || 0) >= 80 ? "text-green-400" : (m.confidence_score || 0) >= 60 ? "text-yellow-400" : "text-destructive"}`}>
-                      {m.confidence_score}/100
-                    </span>
+                    <span className={`font-bold ${(m.confidence_score || 0) >= 80 ? "text-green-400" : (m.confidence_score || 0) >= 60 ? "text-yellow-400" : "text-destructive"}`}>{m.confidence_score}/100</span>
                   </td>
                 </tr>
               ))}

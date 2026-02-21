@@ -18,7 +18,7 @@ const NavBar = () => {
 
   const navItems = [
     { to: "/", label: "Idea", icon: Sparkles },
-    
+
     { to: "/compare", label: "Compare", icon: GitCompareArrows },
     { to: "/scoreboard", label: "Scoreboard", icon: Trophy },
     { to: "/history", label: "History", icon: History },
@@ -37,26 +37,14 @@ const NavBar = () => {
 
         <div className="flex items-center gap-1">
           {navItems.map(({ to, label, icon: Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === to
-                  ? "bg-primary/20 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}
-            >
+            <Link key={to} to={to} className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === to ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}>
               <span className="flex items-center gap-1.5">
                 <Icon className="w-4 h-4" />
                 <span className="hidden sm:inline">{label}</span>
               </span>
             </Link>
           ))}
-          <button
-            onClick={() => setDark(d => !d)}
-            className="ml-2 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-            aria-label="Toggle theme"
-          >
+          <button onClick={() => setDark((d) => !d)} className="ml-2 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors" aria-label="Toggle theme">
             {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
         </div>

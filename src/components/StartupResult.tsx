@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import { StartupBlueprint, GenerationMetrics } from "@/types/startup";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  ArrowLeft, Star, Zap, Users, LayoutGrid, DollarSign,
-  Code2, Map, TrendingUp, Clock, Coins,
-  Share2, Copy, Download, RefreshCw, Palette, ExternalLink, Info, X, Save
-} from "lucide-react";
+import { ArrowLeft, Star, Zap, Users, LayoutGrid, DollarSign, Code2, Map, TrendingUp, Clock, Coins, Share2, Copy, Download, RefreshCw, Palette, ExternalLink, Info, X, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -15,55 +11,55 @@ import CompetitionSection from "@/components/CompetitionSection";
 import MarketAnalysis from "@/components/MarketAnalysis";
 
 const TECH_INFO: Record<string, { desc: string; url: string }> = {
-  "React": { desc: "Popular UI library for building interactive web interfaces", url: "https://react.dev" },
+  React: { desc: "Popular UI library for building interactive web interfaces", url: "https://react.dev" },
   "Next.js": { desc: "Full-stack React framework with SSR and API routes", url: "https://nextjs.org" },
   "Vue.js": { desc: "Progressive JavaScript framework for building UIs", url: "https://vuejs.org" },
-  "Angular": { desc: "Platform for building mobile and desktop web apps", url: "https://angular.dev" },
-  "Svelte": { desc: "Compiler-based framework with minimal runtime overhead", url: "https://svelte.dev" },
-  "TypeScript": { desc: "Typed superset of JavaScript for safer code", url: "https://typescriptlang.org" },
+  Angular: { desc: "Platform for building mobile and desktop web apps", url: "https://angular.dev" },
+  Svelte: { desc: "Compiler-based framework with minimal runtime overhead", url: "https://svelte.dev" },
+  TypeScript: { desc: "Typed superset of JavaScript for safer code", url: "https://typescriptlang.org" },
   "Tailwind CSS": { desc: "Utility-first CSS framework for rapid UI development", url: "https://tailwindcss.com" },
   "Node.js": { desc: "JavaScript runtime for server-side applications", url: "https://nodejs.org" },
-  "Express": { desc: "Minimal and flexible Node.js web application framework", url: "https://expressjs.com" },
-  "FastAPI": { desc: "High-performance Python web framework for APIs", url: "https://fastapi.tiangolo.com" },
-  "Django": { desc: "High-level Python web framework with batteries included", url: "https://djangoproject.com" },
-  "Flask": { desc: "Lightweight Python web framework for small to medium apps", url: "https://flask.palletsprojects.com" },
-  "PostgreSQL": { desc: "Advanced open-source relational database", url: "https://postgresql.org" },
-  "MongoDB": { desc: "NoSQL document database for flexible data models", url: "https://mongodb.com" },
-  "Redis": { desc: "In-memory data store for caching and real-time apps", url: "https://redis.io" },
-  "Supabase": { desc: "Open-source Firebase alternative with Postgres", url: "https://supabase.com" },
-  "Firebase": { desc: "Google's platform for building mobile and web apps", url: "https://firebase.google.com" },
-  "AWS": { desc: "Amazon's comprehensive cloud computing platform", url: "https://aws.amazon.com" },
+  Express: { desc: "Minimal and flexible Node.js web application framework", url: "https://expressjs.com" },
+  FastAPI: { desc: "High-performance Python web framework for APIs", url: "https://fastapi.tiangolo.com" },
+  Django: { desc: "High-level Python web framework with batteries included", url: "https://djangoproject.com" },
+  Flask: { desc: "Lightweight Python web framework for small to medium apps", url: "https://flask.palletsprojects.com" },
+  PostgreSQL: { desc: "Advanced open-source relational database", url: "https://postgresql.org" },
+  MongoDB: { desc: "NoSQL document database for flexible data models", url: "https://mongodb.com" },
+  Redis: { desc: "In-memory data store for caching and real-time apps", url: "https://redis.io" },
+  Supabase: { desc: "Open-source Firebase alternative with Postgres", url: "https://supabase.com" },
+  Firebase: { desc: "Google's platform for building mobile and web apps", url: "https://firebase.google.com" },
+  AWS: { desc: "Amazon's comprehensive cloud computing platform", url: "https://aws.amazon.com" },
   "Amazon Bedrock": { desc: "Fully managed service for foundation models on AWS", url: "https://aws.amazon.com/bedrock" },
   "Google Cloud": { desc: "Google's suite of cloud computing services", url: "https://cloud.google.com" },
-  "Vercel": { desc: "Platform for frontend frameworks and static sites", url: "https://vercel.com" },
-  "Docker": { desc: "Container platform for consistent dev and deployment", url: "https://docker.com" },
-  "Kubernetes": { desc: "Container orchestration for automated deployment", url: "https://kubernetes.io" },
-  "Terraform": { desc: "Infrastructure as code for cloud resource management", url: "https://terraform.io" },
-  "Datadog": { desc: "Monitoring and analytics platform for cloud apps", url: "https://datadoghq.com" },
-  "Grafana": { desc: "Open-source analytics and monitoring visualization", url: "https://grafana.com" },
-  "Stripe": { desc: "Payment processing platform for online businesses", url: "https://stripe.com" },
-  "OpenAI": { desc: "AI research lab providing GPT models and APIs", url: "https://openai.com" },
-  "TensorFlow": { desc: "Open-source ML framework by Google", url: "https://tensorflow.org" },
-  "PyTorch": { desc: "Deep learning framework with dynamic computation", url: "https://pytorch.org" },
-  "LangChain": { desc: "Framework for building LLM-powered applications", url: "https://langchain.com" },
-  "Pinecone": { desc: "Vector database for similarity search and AI apps", url: "https://pinecone.io" },
-  "Elasticsearch": { desc: "Distributed search and analytics engine", url: "https://elastic.co" },
-  "GraphQL": { desc: "Query language for APIs with flexible data fetching", url: "https://graphql.org" },
-  "Prisma": { desc: "Next-generation ORM for Node.js and TypeScript", url: "https://prisma.io" },
+  Vercel: { desc: "Platform for frontend frameworks and static sites", url: "https://vercel.com" },
+  Docker: { desc: "Container platform for consistent dev and deployment", url: "https://docker.com" },
+  Kubernetes: { desc: "Container orchestration for automated deployment", url: "https://kubernetes.io" },
+  Terraform: { desc: "Infrastructure as code for cloud resource management", url: "https://terraform.io" },
+  Datadog: { desc: "Monitoring and analytics platform for cloud apps", url: "https://datadoghq.com" },
+  Grafana: { desc: "Open-source analytics and monitoring visualization", url: "https://grafana.com" },
+  Stripe: { desc: "Payment processing platform for online businesses", url: "https://stripe.com" },
+  OpenAI: { desc: "AI research lab providing GPT models and APIs", url: "https://openai.com" },
+  TensorFlow: { desc: "Open-source ML framework by Google", url: "https://tensorflow.org" },
+  PyTorch: { desc: "Deep learning framework with dynamic computation", url: "https://pytorch.org" },
+  LangChain: { desc: "Framework for building LLM-powered applications", url: "https://langchain.com" },
+  Pinecone: { desc: "Vector database for similarity search and AI apps", url: "https://pinecone.io" },
+  Elasticsearch: { desc: "Distributed search and analytics engine", url: "https://elastic.co" },
+  GraphQL: { desc: "Query language for APIs with flexible data fetching", url: "https://graphql.org" },
+  Prisma: { desc: "Next-generation ORM for Node.js and TypeScript", url: "https://prisma.io" },
   "GitHub Actions": { desc: "CI/CD automation built into GitHub", url: "https://github.com/features/actions" },
-  "Jenkins": { desc: "Open-source automation server for CI/CD", url: "https://jenkins.io" },
-  "Sentry": { desc: "Error tracking and performance monitoring platform", url: "https://sentry.io" },
-  "Twilio": { desc: "Cloud communications platform for SMS, voice, video", url: "https://twilio.com" },
-  "SendGrid": { desc: "Cloud-based email delivery and management service", url: "https://sendgrid.com" },
-  "Kafka": { desc: "Distributed event streaming platform", url: "https://kafka.apache.org" },
-  "RabbitMQ": { desc: "Open-source message broker for async communication", url: "https://rabbitmq.com" },
-  "Go": { desc: "Fast, statically typed language by Google", url: "https://go.dev" },
-  "Rust": { desc: "Systems language focused on safety and performance", url: "https://rust-lang.org" },
-  "Python": { desc: "Versatile high-level programming language", url: "https://python.org" },
+  Jenkins: { desc: "Open-source automation server for CI/CD", url: "https://jenkins.io" },
+  Sentry: { desc: "Error tracking and performance monitoring platform", url: "https://sentry.io" },
+  Twilio: { desc: "Cloud communications platform for SMS, voice, video", url: "https://twilio.com" },
+  SendGrid: { desc: "Cloud-based email delivery and management service", url: "https://sendgrid.com" },
+  Kafka: { desc: "Distributed event streaming platform", url: "https://kafka.apache.org" },
+  RabbitMQ: { desc: "Open-source message broker for async communication", url: "https://rabbitmq.com" },
+  Go: { desc: "Fast, statically typed language by Google", url: "https://go.dev" },
+  Rust: { desc: "Systems language focused on safety and performance", url: "https://rust-lang.org" },
+  Python: { desc: "Versatile high-level programming language", url: "https://python.org" },
   "React Native": { desc: "Build native mobile apps using React", url: "https://reactnative.dev" },
-  "Flutter": { desc: "Google's UI toolkit for cross-platform apps", url: "https://flutter.dev" },
-  "Swift": { desc: "Apple's programming language for iOS/macOS apps", url: "https://swift.org" },
-  "Kotlin": { desc: "Modern language for Android and server-side dev", url: "https://kotlinlang.org" },
+  Flutter: { desc: "Google's UI toolkit for cross-platform apps", url: "https://flutter.dev" },
+  Swift: { desc: "Apple's programming language for iOS/macOS apps", url: "https://swift.org" },
+  Kotlin: { desc: "Modern language for Android and server-side dev", url: "https://kotlinlang.org" },
 };
 
 const TechChip = ({ tech }: { tech: string }) => {
@@ -71,30 +67,15 @@ const TechChip = ({ tech }: { tech: string }) => {
   const info = TECH_INFO[tech];
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => info && setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <span
-        className={`inline-block px-3 py-1 rounded-full border text-sm font-medium transition-all ${
-          info
-            ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 cursor-pointer"
-            : "bg-primary/10 border-primary/20 text-primary"
-        }`}
-      >
+    <div className="relative" onMouseEnter={() => info && setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <span className={`inline-block px-3 py-1 rounded-full border text-sm font-medium transition-all ${info ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 cursor-pointer" : "bg-primary/10 border-primary/20 text-primary"}`}>
         {tech}
       </span>
       {open && info && (
         <div className="absolute z-50 top-full mt-2 left-0 w-64 rounded-xl border border-border/60 bg-card shadow-xl p-4 animate-in fade-in-0 zoom-in-95 pointer-events-auto">
           <p className="font-semibold text-sm mb-1">{tech}</p>
           <p className="text-xs text-muted-foreground mb-3">{info.desc}</p>
-          <a
-            href={info.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-          >
+          <a href={info.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
             Learn more <ExternalLink className="w-3 h-3" />
           </a>
         </div>
@@ -110,23 +91,12 @@ interface Props {
   startupId?: string | null;
 }
 
-const Badge = ({ children }: { children: React.ReactNode }) => (
-  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/15 text-primary border border-primary/20">
-    {children}
-  </span>
-);
+const Badge = ({ children }: { children: React.ReactNode }) => <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/15 text-primary border border-primary/20">{children}</span>;
 
-const SectionCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <div className={`rounded-2xl border border-border/60 bg-card p-6 ${className}`}>{children}</div>
-);
+const SectionCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => <div className={`rounded-2xl border border-border/60 bg-card p-6 ${className}`}>{children}</div>;
 
 const RegenerateBtn = ({ loading, onClick }: { loading: boolean; onClick: () => void }) => (
-  <button
-    onClick={onClick}
-    disabled={loading}
-    title="Regenerate this section"
-    className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-40"
-  >
+  <button onClick={onClick} disabled={loading} title="Regenerate this section" className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-40">
     <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
   </button>
 );
@@ -140,9 +110,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const shareUrl = startupId
-    ? `${window.location.origin}/startup/${startupId}`
-    : null;
+  const shareUrl = startupId ? `${window.location.origin}/startup/${startupId}` : null;
 
   const handleShare = () => {
     if (shareUrl) {
@@ -154,7 +122,10 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
   };
 
   const handleSteal = () => {
-    const prompt = `Build me an MVP for ${startup.name} — ${startup.tagline}. It's a ${startup.category} startup targeting ${startup.targetPersona.name}. Core features: ${startup.coreFeatures.slice(0, 3).map(f => f.name).join(", ")}.`;
+    const prompt = `Build me an MVP for ${startup.name} — ${startup.tagline}. It's a ${startup.category} startup targeting ${startup.targetPersona.name}. Core features: ${startup.coreFeatures
+      .slice(0, 3)
+      .map((f) => f.name)
+      .join(", ")}.`;
     navigator.clipboard.writeText(prompt);
     toast.success("Prompt copied! Paste it into any AI tool 🚀");
   };
@@ -240,22 +211,20 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
 
     // ── Core Features ──
     addSection("Core Features");
-    startup.coreFeatures.forEach(f => addText(`${f.name}: ${f.description}`, 9));
+    startup.coreFeatures.forEach((f) => addText(`${f.name}: ${f.description}`, 9));
 
     // ── Pricing Model ──
     addSection("Pricing Model");
     addText(`Model: ${startup.pricingModel.type}`, 10);
-    startup.pricingModel.tiers.forEach(t => addText(`${t.name} — ${t.price}: ${t.features.join(", ")}`, 9));
+    startup.pricingModel.tiers.forEach((t) => addText(`${t.name} — ${t.price}: ${t.features.join(", ")}`, 9));
 
     // ── Tech Stack ──
     addSection("Tech Stack");
-    Object.entries(startup.techStack).forEach(([layer, techs]) =>
-      addText(`${layer.toUpperCase()}: ${(techs as string[]).join(", ")}`, 9)
-    );
+    Object.entries(startup.techStack).forEach(([layer, techs]) => addText(`${layer.toUpperCase()}: ${(techs as string[]).join(", ")}`, 9));
 
     // ── Launch Roadmap ──
     addSection("Launch Roadmap");
-    startup.launchRoadmap.forEach(p => addText(`${p.week} — ${p.phase}: ${p.tasks.join(" | ")}`, 9));
+    startup.launchRoadmap.forEach((p) => addText(`${p.week} — ${p.phase}: ${p.tasks.join(" | ")}`, 9));
 
     // ── Investor Pitch ──
     addSection("Investor Pitch");
@@ -298,7 +267,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
         body: { idea: startup.tagline, startupName: startup.name, section },
       });
       if (error || data?.error) throw new Error(data?.error || error?.message);
-      setStartup(prev => ({ ...prev, ...data.sectionData }));
+      setStartup((prev) => ({ ...prev, ...data.sectionData }));
       setHasUnsavedChanges(true);
       toast.success("Section regenerated! Click Save to keep changes.");
     } catch (e: unknown) {
@@ -340,8 +309,14 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
         <div className="flex items-center gap-2 flex-wrap">
           {metrics && (
             <div className="flex items-center gap-3 text-xs text-muted-foreground mr-2">
-              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{(metrics.generationTimeMs / 1000).toFixed(1)}s</span>
-              <span className="flex items-center gap-1"><Coins className="w-3 h-3" />{metrics.totalTokens.toLocaleString()} tokens</span>
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {(metrics.generationTimeMs / 1000).toFixed(1)}s
+              </span>
+              <span className="flex items-center gap-1">
+                <Coins className="w-3 h-3" />
+                {metrics.totalTokens.toLocaleString()} tokens
+              </span>
             </div>
           )}
           <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5 text-xs border-border/60 hover:border-primary/40">
@@ -371,20 +346,14 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
             {logoUrl ? (
               <img src={logoUrl} alt={`${startup.name} logo`} className="w-20 h-20 rounded-2xl object-cover border border-border/60" />
             ) : (
-              <div className="w-20 h-20 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-4xl">
-                🚀
-              </div>
+              <div className="w-20 h-20 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-4xl">🚀</div>
             )}
             <button
               onClick={handleGenerateLogo}
               disabled={generatingLogo}
               title="Generate AI logo"
-              className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-card border border-border/60 flex items-center justify-center hover:border-primary/40 hover:text-primary transition-colors shadow-lg"
-            >
-              {generatingLogo
-                ? <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                : <Palette className="w-3 h-3" />
-              }
+              className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-card border border-border/60 flex items-center justify-center hover:border-primary/40 hover:text-primary transition-colors shadow-lg">
+              {generatingLogo ? <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> : <Palette className="w-3 h-3" />}
             </button>
           </div>
 
@@ -415,8 +384,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
             { id: "tech", label: "Tech Stack", icon: Code2 },
             { id: "pitch", label: "Investor Pitch", icon: TrendingUp },
           ].map(({ id, label, icon: Icon }) => (
-            <TabsTrigger key={id} value={id}
-              className="flex items-center gap-2 text-sm py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            <TabsTrigger key={id} value={id} className="flex items-center gap-2 text-sm py-2.5 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
               <Icon className="w-4 h-4" />
               <span className="hidden sm:inline">{label}</span>
             </TabsTrigger>
@@ -425,9 +393,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
 
         {/* OVERVIEW */}
         <TabsContent value="overview" className="space-y-6">
-          {startup.evaluationScores && (
-            <EvaluationScoresCard scores={startup.evaluationScores} />
-          )}
+          {startup.evaluationScores && <EvaluationScoresCard scores={startup.evaluationScores} />}
           <MarketAnalysis startup={startup} />
           <div className="grid md:grid-cols-2 gap-6">
             <SectionCard>
@@ -498,12 +464,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
             </SectionCard>
           </div>
 
-          <CompetitionSection
-            idea={startup.tagline}
-            startupName={startup.name}
-            category={startup.category}
-            startupId={startupId ?? undefined}
-          />
+          <CompetitionSection idea={startup.tagline} startupName={startup.name} category={startup.category} startupId={startupId ?? undefined} />
         </TabsContent>
 
         {/* PRODUCT */}
@@ -540,9 +501,7 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
               <div className="space-y-6">
                 {startup.launchRoadmap.map((phase, i) => (
                   <div key={i} className="relative flex gap-4">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-xs font-bold text-primary shrink-0 z-10">
-                      {i + 1}
-                    </div>
+                    <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-xs font-bold text-primary shrink-0 z-10">{i + 1}</div>
                     <div className="flex-1 pb-2">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="font-semibold">{phase.phase}</span>
@@ -563,7 +522,6 @@ const StartupResult = ({ startup: initialStartup, metrics, onReset, startupId }:
             </div>
           </SectionCard>
         </TabsContent>
-
 
         {/* TECH */}
         <TabsContent value="tech" className="space-y-6">

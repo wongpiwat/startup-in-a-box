@@ -43,12 +43,7 @@ const CompetitorCard = ({ competitor }: { competitor: Competitor }) => {
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="font-semibold text-foreground">{competitor.name}</h3>
-            <a
-              href={competitor.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 transition-colors"
-            >
+            <a href={competitor.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 transition-colors">
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -58,18 +53,9 @@ const CompetitorCard = ({ competitor }: { competitor: Competitor }) => {
           <div className="relative w-12 h-12">
             <svg viewBox="0 0 36 36" className="w-12 h-12 -rotate-90">
               <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" className="text-border/40" strokeWidth="3" />
-              <circle
-                cx="18" cy="18" r="15" fill="none"
-                stroke="currentColor"
-                className="text-primary"
-                strokeWidth="3"
-                strokeDasharray={`${(competitor.similarity / 100) * 94.25} 94.25`}
-                strokeLinecap="round"
-              />
+              <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" className="text-primary" strokeWidth="3" strokeDasharray={`${(competitor.similarity / 100) * 94.25} 94.25`} strokeLinecap="round" />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-foreground">
-              {competitor.similarity}%
-            </span>
+            <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-foreground">{competitor.similarity}%</span>
           </div>
           <span className="text-[10px] text-muted-foreground mt-0.5">Similar</span>
         </div>
@@ -81,10 +67,7 @@ const CompetitorCard = ({ competitor }: { competitor: Competitor }) => {
         <span>{competitor.funding}</span>
       </div>
 
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
-      >
+      <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors">
         {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         {expanded ? "Hide" : "Show"} strengths & weaknesses
       </button>
@@ -126,11 +109,7 @@ const CompetitionSection = ({ idea, startupName, category, startupId }: Props) =
   useEffect(() => {
     if (!startupId) return;
     const loadSaved = async () => {
-      const { data: row } = await (supabase as any)
-        .from("generation_metrics")
-        .select("result_json")
-        .eq("id", startupId)
-        .single();
+      const { data: row } = await (supabase as any).from("generation_metrics").select("result_json").eq("id", startupId).single();
       const saved = row?.result_json?.competitorAnalysis;
       if (saved) {
         setData(saved);
@@ -143,11 +122,7 @@ const CompetitionSection = ({ idea, startupName, category, startupId }: Props) =
   const saveToDb = async (competitorData: CompetitorData) => {
     if (!startupId) return;
     // Merge into existing result_json
-    const { data: row } = await (supabase as any)
-      .from("generation_metrics")
-      .select("result_json")
-      .eq("id", startupId)
-      .single();
+    const { data: row } = await (supabase as any).from("generation_metrics").select("result_json").eq("id", startupId).single();
     if (row?.result_json) {
       await (supabase as any)
         .from("generation_metrics")
@@ -190,13 +165,7 @@ const CompetitionSection = ({ idea, startupName, category, startupId }: Props) =
           <h2 className="font-bold text-lg">Competition</h2>
         </div>
         {!loaded && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleAnalyze}
-            disabled={loading}
-            className="gap-1.5 text-xs border-border/60 hover:border-primary/40"
-          >
+          <Button variant="outline" size="sm" onClick={handleAnalyze} disabled={loading} className="gap-1.5 text-xs border-border/60 hover:border-primary/40">
             {loading ? (
               <>
                 <div className="w-3.5 h-3.5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -212,22 +181,14 @@ const CompetitionSection = ({ idea, startupName, category, startupId }: Props) =
         )}
       </div>
 
-      {!loaded && !loading && (
-        <p className="text-sm text-muted-foreground">
-          Click "Analyze Competitors" to discover real companies and products in this space using AI.
-        </p>
-      )}
+      {!loaded && !loading && <p className="text-sm text-muted-foreground">Click "Analyze Competitors" to discover real companies and products in this space using AI.</p>}
 
       {loading && (
         <div className="flex items-center justify-center py-8">
           <div className="inline-flex items-center gap-3 text-muted-foreground text-sm">
             <div className="flex gap-1">
               {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                  style={{ animationDelay: `${i * 0.15}s` }}
-                />
+                <div key={i} className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
               ))}
             </div>
             Researching the competitive landscape...
@@ -243,9 +204,7 @@ const CompetitionSection = ({ idea, startupName, category, startupId }: Props) =
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-semibold text-foreground">Market Insight</span>
-                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${threatColors[data.threatLevel] || threatColors.medium}`}>
-                  {data.threatLevel} threat
-                </span>
+                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${threatColors[data.threatLevel] || threatColors.medium}`}>{data.threatLevel} threat</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{data.marketInsight}</p>
             </div>

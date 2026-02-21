@@ -79,45 +79,30 @@ const Scoreboard = () => {
                 <button
                   key={entry.id}
                   onClick={() => navigate(`/startup/${entry.id}`)}
-                  className={`w-full text-left group rounded-2xl border bg-card p-5 transition-all hover:bg-primary/5 ${
-                    style ? `${style.border}` : "border-border/60 hover:border-primary/40"
-                  }`}
-                >
+                  className={`w-full text-left group rounded-2xl border bg-card p-5 transition-all hover:bg-primary/5 ${style ? `${style.border}` : "border-border/60 hover:border-primary/40"}`}>
                   <div className="flex items-center gap-4">
                     {/* Rank */}
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shrink-0 ${
-                      style ? `${style.bg} ${style.text}` : "bg-secondary text-muted-foreground"
-                    }`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shrink-0 ${style ? `${style.bg} ${style.text}` : "bg-secondary text-muted-foreground"}`}>
                       {i < 3 ? <RankIcon className="w-5 h-5" /> : `#${i + 1}`}
                     </div>
 
                     {/* Logo or emoji */}
                     <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-xl shrink-0 overflow-hidden">
-                      {entry.logo_url ? (
-                        <img src={entry.logo_url} alt="" className="w-full h-full object-cover rounded-xl" />
-                      ) : "🚀"}
+                      {entry.logo_url ? <img src={entry.logo_url} alt="" className="w-full h-full object-cover rounded-xl" /> : "🚀"}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className={`font-bold truncate ${i < 3 ? "text-foreground" : ""}`}>
-                          {entry.startup_name ?? "Untitled"}
-                        </span>
-                        {entry.category && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20 shrink-0">
-                            {entry.category}
-                          </span>
-                        )}
+                        <span className={`font-bold truncate ${i < 3 ? "text-foreground" : ""}`}>{entry.startup_name ?? "Untitled"}</span>
+                        {entry.category && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20 shrink-0">{entry.category}</span>}
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{entry.idea}</p>
                     </div>
 
                     {/* Score */}
                     <div className="text-right shrink-0">
-                      <div className={`text-2xl font-black ${i < 3 ? "gradient-text" : "text-muted-foreground"}`}>
-                        {entry.confidence_score}
-                      </div>
+                      <div className={`text-2xl font-black ${i < 3 ? "gradient-text" : "text-muted-foreground"}`}>{entry.confidence_score}</div>
                       <div className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
                         <Star className="w-3 h-3" /> Score
                       </div>

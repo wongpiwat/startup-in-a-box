@@ -27,11 +27,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from("generation_metrics")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(100);
+      const { data, error } = await (supabase as any).from("generation_metrics").select("*").order("created_at", { ascending: false }).limit(100);
       if (!error && data) setMetrics(data as MetricRow[]);
       setLoading(false);
     };

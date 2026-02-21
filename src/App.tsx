@@ -22,7 +22,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          
+
           <Route path="/compare" element={<Compare />} />
           <Route path="/scoreboard" element={<Scoreboard />} />
           <Route path="/history" element={<History />} />
